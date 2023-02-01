@@ -5,24 +5,29 @@ admin.initializeApp()
 const db = admin.database()
 
 
-exports.NewReview = functions.database.ref("/images_reviews/{doc_id}")
+exports.NewReview = functions.database.ref("/connections/{sender_id}/like/{receiver_id}")
     .onCreate((snapshot, context) => {
         try {
-            let review = snapshot.val()
-            let userId = review.userID
-            let createdReviewId = context.params.doc_id
-            console.log("userId   ",userId)
-            console.log("createdReviewId   ",createdReviewId)
+            let like = snapshot.val()
+            let sender_id = context.params.sender_id
+            let receiver_id = context.params.receiver_id
+            console.log("sender_id   ",sender_id)
+            console.log("receiver_id   ",receiver_id)
             
-            const ref = db.ref(`users/${userId}`);
+            const ref = db.ref(`users/${sender_id}`);
+            const ref2 = db.ref(`users/${receiver_id}`);
             console.log("check-----------------")
             return ref.once('value', (snapshot) => {
               console.log("snapshot.value",snapshot.val());
               var user = snapshot.val()
-              return sendEmail(user.name,user.email)
-                      }, (errorObject) => {
-                      console.log('The read failed: ' + errorObject.name)
-                      })
+              return ref2.once('value', (snapshot2) => {
+                  console.log("snapshot2.value",snapshot2.val());
+                  var user2 = snapshot2.val()
+                  return sendEmail(user.name,user2.email)
+                }, (errorObject) => {
+                console.log('The read failed: ' + errorObject.name)
+                })
+              })
         
         } catch (error) {
             return error
