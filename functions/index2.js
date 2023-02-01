@@ -19,7 +19,7 @@ exports.NewReview = functions.database.ref("/connections/{receiver_id}/like/{sen
             return ref2.once('value', (snapshot2) => {
               console.log("snapshot2.value",snapshot2.val());
               var user2 = snapshot2.val()
-              var useremail = user2.email ?? ""
+              var useremail = user2?.email ?? ""
               return sendEmail(useremail)
             }, (errorObject) => {
             console.log('The read failed: ' + errorObject.name)
@@ -39,7 +39,7 @@ exports.NewReview = functions.database.ref("/connections/{receiver_id}/like/{sen
             requireTLS:true,
             auth: {
               user: "edpjuntamundos@gmail.com",
-              pass: "frukeedtxyulgcqh",
+              pass: "hnkkuexwonxfultk",
             },
           })
           console.log("info",email)
@@ -47,7 +47,7 @@ exports.NewReview = functions.database.ref("/connections/{receiver_id}/like/{sen
           var getEmailBody = getEmailBody2()
           var mailInfo  = {
             html:getEmailBody,
-            from: `Juntamundos App`,
+            from: `Juntamundos App <edpjuntamundos@gmail.com>`,
             to: email,
             subject: "Like Alert",
           }
@@ -56,7 +56,7 @@ exports.NewReview = functions.database.ref("/connections/{receiver_id}/like/{sen
               console.log("successfully sent that mail")
           })
             .catch(function(err) {
-              console.log(err)
+              console.log("Error sending email",err)
             })
     }
     function getEmailBody2(){
@@ -174,7 +174,7 @@ exports.NewReview = functions.database.ref("/connections/{receiver_id}/like/{sen
                               <h3 style="font-family: Lato, sans-serif;
                               color: #000;
                               margin-top: 0;
-                              font-weight: 400;font-size: 24px;
+                              font-weight: 400;font-size: 15px;
                 font-weight: 300;">You have recieved a new like. Go to Juntamundos application to see who has liked your profile</h3>
                               <a class="btn btn-google" href="https://play.google.com/store/apps/details?id=com.edp.juntamundos&amp;gl=US" title="Google Play" style="
                               color: #fff;
