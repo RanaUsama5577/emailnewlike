@@ -5,7 +5,7 @@ admin.initializeApp()
 const db = admin.database()
 
 
-exports.NewReview = functions.database.ref("/connections/{sender_id}/like/{receiver_id}")
+exports.NewReview = functions.database.ref("/connections/{receiver_id}/like/{sender_id}")
     .onCreate((snapshot, context) => {
         try {
             let like = snapshot.val()
@@ -14,20 +14,16 @@ exports.NewReview = functions.database.ref("/connections/{sender_id}/like/{recei
             console.log("sender_id   ",sender_id)
             console.log("receiver_id   ",receiver_id)
             
-            const ref = db.ref(`users/${sender_id}`);
+            // const ref = db.ref(`users/${sender_id}`);
             const ref2 = db.ref(`users/${receiver_id}`);
-            console.log("check-----------------")
-            return ref.once('value', (snapshot) => {
-              console.log("snapshot.value",snapshot.val());
-              var user = snapshot.val()
-              return ref2.once('value', (snapshot2) => {
-                  console.log("snapshot2.value",snapshot2.val());
-                  var user2 = snapshot2.val()
-                  return sendEmail(user.name,user2.email)
-                }, (errorObject) => {
-                console.log('The read failed: ' + errorObject.name)
-                })
-              })
+            return ref2.once('value', (snapshot2) => {
+              console.log("snapshot2.value",snapshot2.val());
+              var user2 = snapshot2.val()
+              var useremail = user2.email ?? ""
+              return sendEmail(useremail)
+            }, (errorObject) => {
+            console.log('The read failed: ' + errorObject.name)
+            })
         
         } catch (error) {
             return error
@@ -35,7 +31,7 @@ exports.NewReview = functions.database.ref("/connections/{sender_id}/like/{recei
     })
 
 
-    function sendEmail(name,email){
+    function sendEmail(email){
         const authData = nodemailer.createTransport({
             host: "smtp.gmail.com",
             port: 587,
@@ -46,14 +42,14 @@ exports.NewReview = functions.database.ref("/connections/{sender_id}/like/{recei
               pass: "frukeedtxyulgcqh",
             },
           })
-          console.log("info",name,email)
+          console.log("info",email)
 
-          var getEmailBody = getEmailBody2(name)
+          var getEmailBody = getEmailBody2()
           var mailInfo  = {
             html:getEmailBody,
-            from: `edpjuntamundos@gmail.com`,
+            from: `Juntamundos App`,
             to: email,
-            subject: "New Like",
+            subject: "Like Alert",
           }
           return authData.sendMail(mailInfo)
           .then(function() {
@@ -63,7 +59,7 @@ exports.NewReview = functions.database.ref("/connections/{sender_id}/like/{recei
               console.log(err)
             })
     }
-    function getEmailBody2(name){
+    function getEmailBody2(){
         var html = `<!DOCTYPE html>
         <html
           lang="en"
@@ -179,7 +175,7 @@ exports.NewReview = functions.database.ref("/connections/{sender_id}/like/{recei
                               color: #000;
                               margin-top: 0;
                               font-weight: 400;font-size: 24px;
-                font-weight: 300;">You have recieved a new like from ${name}</h3>
+                font-weight: 300;">You have recieved a new like. Go to Juntamundos application to see who has liked your profile</h3>
                               <a class="btn btn-google" href="https://play.google.com/store/apps/details?id=com.edp.juntamundos&amp;gl=US" title="Google Play" style="
                               color: #fff;
                               padding: 10px 16px;
